@@ -31,13 +31,30 @@ class Movie(db.Model):
         return f'<Book {self.title}>'
 db.create_all()
 
+class LoginForm(FlaskForm):
+    rating = StringField('Rating', validators=[DataRequired()])
+    review = StringField('Review', validators=[DataRequired()])
+    submit = SubmitField("Update")
+
 
 @app.route("/")
 def home():
     movies = db.session.query(Movie).all()
-    print(movies)
     return render_template("index.html", movies=movies)
 
+@app.route("/edit", methods=['GET', 'POST'])
+def edit():
+    form = LoginForm()
+    movie_id = request.args.get("id")
+    movie = Movie.query.get(movie_id)
+
+    if form.validate_on_submit():
+        movie.rating = float(form.rating.data)
+        movie.review = form.review.data
+        db.session.commit()
+        movies = db.session.query(Movie).all()
+        return render_template("index.html", movies=movies)
+    return render_template("edit.html", form=form, movie=movie)
 
 if __name__ == '__main__':
     app.run(debug=True)
