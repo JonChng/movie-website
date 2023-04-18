@@ -34,7 +34,9 @@ db.create_all()
 
 @app.route("/")
 def home():
-    return render_template("index.html")
+    movies = db.session.query(Movie).all()
+    print(movies)
+    return render_template("index.html", movies=movies)
 
 
 if __name__ == '__main__':
