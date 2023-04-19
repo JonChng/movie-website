@@ -37,8 +37,9 @@ class LoginForm(FlaskForm):
     submit = SubmitField("Update")
 
 
-@app.route("/")
+@app.route("/", )
 def home():
+
     movies = db.session.query(Movie).all()
     return render_template("index.html", movies=movies)
 
@@ -55,6 +56,15 @@ def edit():
         movies = db.session.query(Movie).all()
         return render_template("index.html", movies=movies)
     return render_template("edit.html", form=form, movie=movie)
+
+@app.route("/delete", methods=['GET','POST'])
+def delete():
+    movie_id = request.args.get("id")
+    print(movie_id)
+    Movie.query.filter_by(id=movie_id).delete()
+    db.session.commit()
+    return redirect(url_for("home"))
+
 
 if __name__ == '__main__':
     app.run(debug=True)

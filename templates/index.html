@@ -11,6 +11,15 @@
 
 {% block title %}My Top 10 Movies{% endblock %}
 
+{% block scripts %}
+    {{ super() }}
+    <script>
+    function myFunction(elem){
+
+    }
+    </script>
+{% endblock %}
+
 {% block content %}
 <div class="container">
   <h1 class="heading">My Top 10 Movies</h1>
@@ -34,7 +43,10 @@
         </p>
 
         <a href="{{ url_for('edit', id=i.id) }}" class="button">Update</a>
-        <a href="#" class="button delete-button">Delete</a>
+        <a href="{{ url_for('delete', id=i.id) }}" class="button delete-button">Delete</a>
+
+
+
 
       </div>
     </div>
