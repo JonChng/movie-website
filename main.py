@@ -5,6 +5,13 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 import requests
+import os
+import dotenv
+
+dotenv.load_dotenv()
+api = os.environ["API"]
+endpoint1 = "https://api.themoviedb.org/3/search/movie"
+endpoint2 = "https://api.themoviedb.org/3/movie"
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
@@ -86,7 +93,33 @@ def delete():
 def add():
     form = AddForm()
 
+    if form.validate_on_submit():
+        params = {
+            "api_key": api,
+            "query": form.movie_title.data
+        }
+
+        data = requests.get(endpoint1, params=params)
+        data.raise_for_status()
+        movies = data.json()['results']
+
+        return render_template('select.html', movies=movies)
+
     return render_template("add.html", form=form)
+
+@app.route("/add1", methods=['GET','POST'])
+def final_add():
+    id = request.args.get("id")
+    params = {
+        "api_key": api,
+        "movie_id": id
+    }
+    data = requests.get(url = f"https://api.themoviedb.org/3/movie/{id}?api_key={api}&language=en-US")
+    data.raise_for_status()
+    print(data.json())
+
+    return render_template("index.html")
+
 
 
 if __name__ == '__main__':
