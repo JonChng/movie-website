@@ -117,6 +117,10 @@ def final_add():
     data = requests.get(url = f"https://api.themoviedb.org/3/movie/{id}?api_key={api}&language=en-US")
     data.raise_for_status()
     print(data.json())
+    title = data.json()['original_title']
+    img_url = data.json()[]
+    description = data.json()['overview']
+    year = data.json()['release_date'].split("-")[0]
 
     return render_template("index.html")
 
