@@ -67,7 +67,7 @@ def home():
     movies = Movie.query.order_by(Movie.rating).all()
     for i in range(len(movies)):
         print(movies[i])
-        movies[i].ranking = i + 1
+        movies[i].ranking = len(movies[i::])
     return render_template("index.html", movies=movies)
 
 @app.route("/edit", methods=['GET', 'POST'])
