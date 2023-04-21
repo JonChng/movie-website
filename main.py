@@ -114,15 +114,23 @@ def final_add():
         "api_key": api,
         "movie_id": id
     }
-    data = requests.get(url = f"https://api.themoviedb.org/3/movie/{id}?api_key={api}&language=en-US")
-    data.raise_for_status()
-    print(data.json())
-    title = data.json()['original_title']
-    img_url = data.json()[]
-    description = data.json()['overview']
-    year = data.json()['release_date'].split("-")[0]
+    response = requests.get(url = f"https://api.themoviedb.org/3/movie/{id}?api_key={api}&language=en-US")
+    response.raise_for_status()
+    data = response.json()
+    new_movie = Movie(
+        title=data["title"],
+        # The data in release_date includes month and day, we will want to get rid of.
+        year=data["release_date"].split("-")[0],
+        img_url=f"https://image.tmdb.org/t/p/original{data['poster_path']}",
+        description=data["overview"],
+        rating=0,
+        ranking=10,
+        review="None"
+    )
+    db.session.add(new_movie)
+    db.session.commit()
+    return redirect(url_for("home"))
 
-    return render_template("index.html")
 
 
 
