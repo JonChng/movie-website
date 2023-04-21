@@ -7,6 +7,7 @@ from wtforms.validators import DataRequired
 import requests
 import os
 import dotenv
+from sqlalchemy import desc
 
 dotenv.load_dotenv()
 api = os.environ["API"]
@@ -29,9 +30,9 @@ class Movie(db.Model):
     year = db.Column(db.String(250), nullable=False)
     description = db.Column(db.String(500), nullable=False)
     rating = db.Column(db.Integer, nullable=False)
-    ranking = db.Column(db.Integer, unique=True, nullable=False)
     review = db.Column(db.String(250), nullable=False)
     img_url = db.Column(db.String(250), nullable=False)
+    ranking = db.Column(db.Integer)
 
     # Optional: this will allow each book object to be identified by its title when printed.
     def __repr__(self):
@@ -61,10 +62,12 @@ class AddForm(FlaskForm):
     submit = SubmitField("Search")
 
 
-@app.route("/", )
+@app.route("/")
 def home():
-
-    movies = db.session.query(Movie).all()
+    movies = Movie.query.order_by(Movie.rating).all()
+    for i in range(len(movies)):
+        print(movies[i])
+        movies[i].ranking = i + 1
     return render_template("index.html", movies=movies)
 
 @app.route("/edit", methods=['GET', 'POST'])
@@ -78,8 +81,9 @@ def edit():
         movie.review = form.review.data
         db.session.commit()
         movies = db.session.query(Movie).all()
-        return render_template("index.html", movies=movies)
-    return render_template("edit.html", form=form, movie=movie)
+        return redirect(url_for("home"))
+    else:
+        return render_template("edit.html", form=form, movie=movie)
 
 @app.route("/delete", methods=['GET','POST'])
 def delete():
@@ -124,13 +128,11 @@ def final_add():
         img_url=f"https://image.tmdb.org/t/p/original{data['poster_path']}",
         description=data["overview"],
         rating=0,
-        ranking=10,
         review="None"
     )
     db.session.add(new_movie)
     db.session.commit()
-    return redirect(url_for("home"))
-
+    return redirect(url_for('edit', id=new_movie.id))
 
 
 
